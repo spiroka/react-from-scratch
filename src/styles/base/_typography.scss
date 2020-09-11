@@ -1,0 +1,42 @@
+@use '../utils/variables' as *;
+
+html {
+  font-size: $font-size-base-sm;
+  font-family: sans-serif;
+
+  @media (min-width: $break-md) {
+    font-size: $font-size-base-md;
+  }
+
+  @media (min-width: $break-lg) {
+    font-size: $font-size-base-lg;
+  }
+}
+
+body {
+  line-height: $line-height-base;
+}
+
+h1, h2, h3, h4 {
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 3.5rem;
+  margin: 0.857em 0;
+}
+
+h2 {
+  font-size: 3rem;
+  margin: 1em 0;
+}
+
+h3 {
+  font-size: 2.5rem;
+  margin: 0.6em 0;
+}
+
+h4 {
+  font-size: 2rem;
+  margin: 0.75em 0;
+}

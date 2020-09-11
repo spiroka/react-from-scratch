@@ -1,0 +1,26 @@
+@use '../utils/variables' as *;
+
+.row {
+  display: block;
+
+  @media (min-width: $break-md) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
+  
+    .col {
+      flex: 0 1 47%;
+    }
+  }
+
+  @media (min-width: $break-lg) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
+  
+    .col {
+      flex: 0 1 21%;
+    }
+  }
+}
+

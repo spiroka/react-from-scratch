@@ -1,0 +1,26 @@
+@use '../layout/grid';
+@use '../utils/spacing';
+
+.album__container {
+  @extend .row;
+}
+
+.album__details {
+  @extend .col;
+  @extend .margin-top-sm;
+  cursor: pointer;
+
+  &:not(:last-child) {
+    @extend .margin-right-sm;
+  }
+
+  &:hover img {
+    transform: scale(1.2);
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    transition: all 0.1s;
+  }
+}

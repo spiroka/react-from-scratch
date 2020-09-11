@@ -1,0 +1,13 @@
+@use '../utils/variables' as *;
+
+.container {
+  padding: 0 2rem;
+  
+  @media (min-width: $break-md) {
+    padding: 0 6rem;
+  }
+  
+  @media (min-width: $break-lg) {
+    padding: 0 6rem;
+  }
+}
