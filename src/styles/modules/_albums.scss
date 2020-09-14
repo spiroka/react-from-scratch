@@ -5,7 +5,7 @@
   @extend .row;
 }
 
-.album__details {
+.album__item {
   @extend .col;
   @extend .margin-top-sm;
   cursor: pointer;
@@ -14,13 +14,30 @@
     @extend .margin-right-sm;
   }
 
-  &:hover img {
+  &:hover .album__thumb {
     transform: scale(1.2);
   }
 
-  img {
+  .album__thumb {
     display: block;
     width: 100%;
     transition: all 0.1s;
+  }
+}
+
+.album__album-details {
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
+  top: 0;
+  left: 0;
+  transition-duration: 500ms;
+  background: white;
+
+  img {
+    position: absolute;
+    top: 50px;
+    left: 10%;
+    width: 80%;
   }
 }

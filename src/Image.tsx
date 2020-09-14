@@ -1,12 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, MutableRefObject, useRef, useCallback } from 'react';
 
-function Image({ src, alt }: { src: string; alt: string }) {
+interface ImageProps {
+  src: string;
+  alt: string;
+  className?: string;
+  forwardRef?: MutableRefObject<HTMLImageElement | undefined>;
+}
+
+function Image({ src, alt, className, forwardRef }: ImageProps) {
   const [loading, setLoading] = useState<boolean>(true);
+
+  const setRef = useCallback((el: HTMLImageElement) => {
+    if (forwardRef) {
+      forwardRef.current = el;
+    }
+  }, [forwardRef]);
 
   return (
     <>
       {loading && 'Loading...'}
-      <img src={src} alt={alt} onLoad={() => setLoading(false)} />
+      <img
+        className={className}
+        ref={setRef}
+        src={src}
+        alt={alt}
+        onLoad={() => setLoading(false)}
+      />
     </>
   );
 }
