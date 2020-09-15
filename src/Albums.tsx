@@ -39,4 +39,4 @@ function Albums({ bandName }: { bandName: string }) {
   );
 }
 
-export default Albums;
+export default React.memo(Albums);

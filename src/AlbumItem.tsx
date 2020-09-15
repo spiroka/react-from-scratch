@@ -15,11 +15,13 @@ function AlbumItem({ album, onClick, active }: AlbumItemProps) {
   return (
     <article className="album__item" onClick={onClick}>
       <Image className="album__thumb" src={album.thumb} alt={album.name} forwardRef={imgRef} />
-      {active && (
-        <AlbumDetails album={album} initialImgRect={imgRef.current?.getBoundingClientRect()} />
-      )}
+      <AlbumDetails
+        open={active}
+        album={album}
+        initialImgRect={imgRef.current?.getBoundingClientRect()}
+      />
     </article>
   );
 }
 
-export default AlbumItem;
+export default React.memo(AlbumItem);

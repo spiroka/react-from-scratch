@@ -1,5 +1,6 @@
 @use '../layout/grid';
 @use '../utils/spacing';
+@use '../utils/variables' as *;
 
 .album__container {
   @extend .row;
@@ -31,7 +32,6 @@
   width: 100vw;
   top: 0;
   left: 0;
-  transition-duration: 500ms;
   background: white;
 
   img {
@@ -39,5 +39,11 @@
     top: 50px;
     left: 10%;
     width: 80%;
+
+    @media (min-width: $break-md) {
+      top: 100px;
+      left: 10%;
+      width: 30%;
+    }
   }
 }

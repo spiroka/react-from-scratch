@@ -1,9 +1,10 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import Album from './model/Album';
 
 interface AlbumDetailsProps {
   album: Album;
-  initialImgRect?: { top: number; left: number; width: number; height: number };
+  open: boolean;
+  initialImgRect?: DOMRect;
 }
 
 const defaultImgRect = {
@@ -11,40 +12,96 @@ const defaultImgRect = {
   left: 0,
   width: 200,
   height: 200,
-};
+} as DOMRect;
 
-function AlbumDetails({ album, initialImgRect = defaultImgRect }: AlbumDetailsProps) {
-  const containerRef = useRef<HTMLElement>(null);
+function animateElementToTargetPosition(el: HTMLElement, from: DOMRect, to: DOMRect) {
+  el.style.top = `${from.top}px`;
+  el.style.left = `${from.left}px`;
+  el.style.width = `${from.width}px`;
+  el.style.height = `${from.height}px`;
+
+  const scaleX = to.width / from.width;
+  const translateX = to.left - from.left + (to.width - from.width) * 0.5;
+  const scaleY = to.height / from.height;
+  const translateY = to.top - from.top + (to.height - from.height) * 0.5;
+
+  setTimeout(() => {
+    el.style.transitionDuration = '500ms';
+    el.style.transform = `translateY(${translateY}px) translateX(${translateX}px) scale(${scaleX}, ${scaleY})`;
+  });
+}
+
+function AlbumDetails({ album, open, initialImgRect = defaultImgRect }: AlbumDetailsProps) {
+  const [visible, setVisible] = useState(open);
+  const imageRef = useRef<HTMLElement>();
+  const [transitioning, setTransitioning] = useState(false);
+
+  useEffect(() => {
+    if (!open) {
+      playExitAnimation();
+    } else {
+      setVisible(true);
+    }
+  }, [open]);
+
+  const playEnterAnimation = useCallback(() => {
+    const el = imageRef.current;
+
+    if (!el) {
+      return;
+    }
+
+    if (transitioning) {
+      el.addEventListener('transitionend', () => {
+        playEnterAnimation();
+      });
+    } else {
+      setTransitioning(true);
+      animateElementToTargetPosition(el, initialImgRect, el.getBoundingClientRect());
+      el.addEventListener('transitionend', () => setTransitioning(false));
+    }
+  }, [transitioning, initialImgRect]);
+
+  const playExitAnimation = useCallback(() => {
+    const el = imageRef.current;
+
+    if (!el) {
+      return;
+    }
+
+    if (transitioning) {
+      el.addEventListener('transitionend', () => {
+        playExitAnimation();
+      });
+    } else {
+      setTransitioning(true);
+      animateElementToTargetPosition(el, el.getBoundingClientRect(), initialImgRect);
+      el.addEventListener('transitionend', () => {
+        setTransitioning(false);
+        setVisible(false);
+      });
+    }
+  }, [transitioning, initialImgRect]);
 
   const setInitialImagePosition = useCallback(
     (el: HTMLImageElement) => {
+      imageRef.current = el;
       if (el) {
-        const targetRect = el.getBoundingClientRect();
-
-        el.style.top = `${initialImgRect.top}px`;
-        el.style.left = `${initialImgRect.left}px`;
-        el.style.width = `${initialImgRect.width}px`;
-        el.style.height = `${initialImgRect.height}px`;
-
-        const scaleX = targetRect.width / initialImgRect.width;
-        const translateX = targetRect.left - initialImgRect.left + ((targetRect.width - initialImgRect.width) * 0.5);
-        const scaleY = targetRect.height / initialImgRect.height;
-        const translateY = targetRect.top - initialImgRect.top + ((targetRect.height - initialImgRect.height) * 0.5);
-
-        setTimeout(() => {
-          el.style.transitionDuration = '500ms';
-          el.style.transform = `translateY(${translateY}px) translateX(${translateX}px) scale(${scaleX}, ${scaleY})`;
-        });
+        playEnterAnimation();
       }
     },
     [initialImgRect]
   );
 
+  if (!visible) {
+    return null;
+  }
+
   return (
-    <section ref={containerRef} className="album__album-details">
+    <section className="album__album-details">
       <img ref={setInitialImagePosition} src={album.thumb} alt={album.name} />
     </section>
   );
 }
 
-export default AlbumDetails;
+export default React.memo(AlbumDetails);
