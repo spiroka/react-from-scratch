@@ -4,6 +4,7 @@ import Album from './model/Album';
 interface AlbumDetailsProps {
   album: Album;
   open: boolean;
+  onClose: () => void;
   initialImgRect?: DOMRect;
 }
 
@@ -31,15 +32,18 @@ function animateElementToTargetPosition(el: HTMLElement, from: DOMRect, to: DOMR
   });
 }
 
-function AlbumDetails({ album, open, initialImgRect = defaultImgRect }: AlbumDetailsProps) {
+function AlbumDetails({
+  album,
+  open,
+  onClose,
+  initialImgRect = defaultImgRect,
+}: AlbumDetailsProps) {
   const [visible, setVisible] = useState(open);
   const imageRef = useRef<HTMLElement>();
   const [transitioning, setTransitioning] = useState(false);
 
   useEffect(() => {
-    if (!open) {
-      playExitAnimation();
-    } else {
+    if (open) {
       setVisible(true);
     }
   }, [open]);
@@ -54,11 +58,11 @@ function AlbumDetails({ album, open, initialImgRect = defaultImgRect }: AlbumDet
     if (transitioning) {
       el.addEventListener('transitionend', () => {
         playEnterAnimation();
-      });
+      }, { once: true });
     } else {
       setTransitioning(true);
       animateElementToTargetPosition(el, initialImgRect, el.getBoundingClientRect());
-      el.addEventListener('transitionend', () => setTransitioning(false));
+      el.addEventListener('transitionend', () => setTransitioning(false), { once: true });
     }
   }, [transitioning, initialImgRect]);
 
@@ -72,16 +76,17 @@ function AlbumDetails({ album, open, initialImgRect = defaultImgRect }: AlbumDet
     if (transitioning) {
       el.addEventListener('transitionend', () => {
         playExitAnimation();
-      });
+      }, { once: true });
     } else {
       setTransitioning(true);
       animateElementToTargetPosition(el, el.getBoundingClientRect(), initialImgRect);
       el.addEventListener('transitionend', () => {
         setTransitioning(false);
         setVisible(false);
-      });
+        onClose();
+      }, { once: true });
     }
-  }, [transitioning, initialImgRect]);
+  }, [transitioning, initialImgRect, onClose, open]);
 
   const setInitialImagePosition = useCallback(
     (el: HTMLImageElement) => {
@@ -98,7 +103,7 @@ function AlbumDetails({ album, open, initialImgRect = defaultImgRect }: AlbumDet
   }
 
   return (
-    <section className="album__album-details">
+    <section className="album__album-details" onClick={playExitAnimation}>
       <img ref={setInitialImagePosition} src={album.thumb} alt={album.name} />
     </section>
   );

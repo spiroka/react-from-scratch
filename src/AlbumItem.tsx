@@ -6,16 +6,17 @@ import AlbumDetails from './AlbumDetails';
 interface AlbumItemProps {
   album: Album;
   active: boolean;
-  onClick: () => void;
+  onClick: (album: Album) => void;
 }
 
 function AlbumItem({ album, onClick, active }: AlbumItemProps) {
   const imgRef = useRef<HTMLImageElement>();
 
   return (
-    <article className="album__item" onClick={onClick}>
+    <article className="album__item" onClick={() => !active && onClick(album)}>
       <Image className="album__thumb" src={album.thumb} alt={album.name} forwardRef={imgRef} />
       <AlbumDetails
+        onClose={() => onClick(album)}
         open={active}
         album={album}
         initialImgRect={imgRef.current?.getBoundingClientRect()}

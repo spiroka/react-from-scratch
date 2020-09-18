@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import useGetAlbums from './useGetAlbums';
 import AlbumItem from './AlbumItem';
 import Album from "./model/Album";
@@ -7,15 +7,15 @@ function Albums({ bandName }: { bandName: string }) {
   const { loading, albums } = useGetAlbums(bandName);
   const [activeAlbum, setActiveAlbum] = useState<string | null>();
 
-  const openAlbum = (album: Album) => {
-    document.body.classList.add('modal-open');
-    setActiveAlbum(album.id)
-  }
-
-  const closeAlbum = () => {
-    document.body.classList.remove('modal-open');
-    setActiveAlbum(null);
-  }
+  const toggleAlbum = useCallback((album: Album) => {
+    if (activeAlbum) {
+      document.body.classList.remove('modal-open');
+      setActiveAlbum(null);
+    } else {
+      document.body.classList.add('modal-open');
+      setActiveAlbum(album.id)
+    }
+  }, [activeAlbum, setActiveAlbum]);
 
   return (
     <article>
@@ -29,7 +29,7 @@ function Albums({ bandName }: { bandName: string }) {
           albums.map((album) => (
             <AlbumItem
               active={activeAlbum === album.id}
-              onClick={() => (activeAlbum ? closeAlbum() : openAlbum(album))}
+              onClick={toggleAlbum}
               key={album.id}
               album={album}
             />

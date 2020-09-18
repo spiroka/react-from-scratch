@@ -6,7 +6,7 @@ import Albums from './Albums';
 function App() {
   return (
     <main className="container">
-      <Albums bandName="Metallica" />
+      <Albums bandName="Neurosis" />
     </main>
   );
 }
