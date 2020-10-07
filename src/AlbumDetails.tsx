@@ -38,6 +38,7 @@ function AlbumDetails({
   onClose,
   initialImgRect = defaultImgRect,
 }: AlbumDetailsProps) {
+  const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(open);
   const imageRef = useRef<HTMLElement>();
   const [transitioning, setTransitioning] = useState(false);
@@ -56,15 +57,28 @@ function AlbumDetails({
     }
 
     if (transitioning) {
-      el.addEventListener('transitionend', () => {
-        playEnterAnimation();
-      }, { once: true });
+      el.addEventListener(
+        'transitionend',
+        () => {
+          playEnterAnimation();
+        },
+        { once: true }
+      );
     } else {
       setTransitioning(true);
       animateElementToTargetPosition(el, initialImgRect, el.getBoundingClientRect());
-      el.addEventListener('transitionend', () => setTransitioning(false), { once: true });
+      el.addEventListener(
+        'transitionend',
+        () => {
+          setTransitioning(false);
+          if (ref.current) {
+            ref.current.focus();
+          }
+        },
+        { once: true }
+      );
     }
-  }, [transitioning, initialImgRect]);
+  }, [transitioning, initialImgRect, ref]);
 
   const playExitAnimation = useCallback(() => {
     const el = imageRef.current;
@@ -74,19 +88,48 @@ function AlbumDetails({
     }
 
     if (transitioning) {
-      el.addEventListener('transitionend', () => {
-        playExitAnimation();
-      }, { once: true });
+      el.addEventListener(
+        'transitionend',
+        () => {
+          playExitAnimation();
+        },
+        { once: true }
+      );
     } else {
       setTransitioning(true);
       animateElementToTargetPosition(el, el.getBoundingClientRect(), initialImgRect);
-      el.addEventListener('transitionend', () => {
-        setTransitioning(false);
-        setVisible(false);
-        onClose();
-      }, { once: true });
+      el.addEventListener(
+        'transitionend',
+        () => {
+          setTransitioning(false);
+          setVisible(false);
+          onClose();
+        },
+        { once: true }
+      );
     }
   }, [transitioning, initialImgRect, onClose, open]);
+
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        playExitAnimation();
+      }
+    },
+    [playExitAnimation]
+  );
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.addEventListener('keyup', handleKeyPress);
+    }
+
+    return () => {
+      if (ref.current) {
+        ref.current.removeEventListener('keyup', handleKeyPress);
+      }
+    };
+  }, [ref, handleKeyPress]);
 
   const setInitialImagePosition = useCallback(
     (el: HTMLImageElement) => {
@@ -103,7 +146,7 @@ function AlbumDetails({
   }
 
   return (
-    <section className="album__album-details" onClick={playExitAnimation}>
+    <section ref={ref} className="album__album-details" onClick={playExitAnimation} tabIndex={0}>
       <img ref={setInitialImagePosition} src={album.thumb} alt={album.name} />
     </section>
   );

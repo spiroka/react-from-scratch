@@ -15,8 +15,12 @@
     @extend .margin-right-sm;
   }
 
-  &:hover .album__thumb {
+  &:hover .album__thumb, &:focus .album__thumb {
     transform: scale(1.2);
+  }
+
+  &:focus .album__thumb {
+    outline: solid 2px blue;
   }
 
   .album__thumb {
@@ -33,6 +37,10 @@
   top: 0;
   left: 0;
   background: white;
+
+  &:focus {
+    outline: none;
+  }
 
   img {
     position: absolute;
