@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import Album from './model/Album';
 import Image from './Image';
 import AlbumDetails from './AlbumDetails';
@@ -13,25 +13,24 @@ function AlbumItem({ album, onClick, active }: AlbumItemProps) {
   const ref = useRef<HTMLElement>(null);
   const imgRef = useRef<HTMLImageElement>();
 
-  const handleClick = useCallback(() => !active && onClick(album), [active, onClick]);
+  const handleClick = useCallback(() => !active && onClick(album), [active, onClick, album]);
 
   const handleKeyPress = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleClick();
-      if (ref.current) {
-        ref.current.blur();
-      }
     }
   }, [handleClick]);
 
   useEffect(() => {
-    if (ref.current) {
-      ref.current.addEventListener('keyup', handleKeyPress);
+    const currentRef = ref.current;
+
+    if (currentRef) {
+      currentRef.addEventListener('keyup', handleKeyPress);
     }
 
     return () => {
-      if (ref.current) {
-        ref.current.removeEventListener('keyup', handleKeyPress);
+      if (currentRef) {
+        currentRef.removeEventListener('keyup', handleKeyPress);
       }
     };
   }, [ref, handleKeyPress]);

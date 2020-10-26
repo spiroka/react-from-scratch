@@ -27,8 +27,12 @@ function animateElementToTargetPosition(el: HTMLElement, from: DOMRect, to: DOMR
   const translateY = to.top - from.top + (to.height - from.height) * 0.5;
 
   setTimeout(() => {
-    el.style.transitionDuration = '500ms';
     el.style.transform = `translateY(${translateY}px) translateX(${translateX}px) scale(${scaleX}, ${scaleY})`;
+    if (!matchMedia('(prefers-reduced-motion)').matches) {
+      el.style.transitionDuration = '500ms';
+    } else {
+      el.dispatchEvent(new Event('transitionend'));
+    }
   });
 }
 
@@ -48,37 +52,6 @@ function AlbumDetails({
       setVisible(true);
     }
   }, [open]);
-
-  const playEnterAnimation = useCallback(() => {
-    const el = imageRef.current;
-
-    if (!el) {
-      return;
-    }
-
-    if (transitioning) {
-      el.addEventListener(
-        'transitionend',
-        () => {
-          playEnterAnimation();
-        },
-        { once: true }
-      );
-    } else {
-      setTransitioning(true);
-      animateElementToTargetPosition(el, initialImgRect, el.getBoundingClientRect());
-      el.addEventListener(
-        'transitionend',
-        () => {
-          setTransitioning(false);
-          if (ref.current) {
-            ref.current.focus();
-          }
-        },
-        { once: true }
-      );
-    }
-  }, [transitioning, initialImgRect, ref]);
 
   const playExitAnimation = useCallback(() => {
     const el = imageRef.current;
@@ -108,7 +81,7 @@ function AlbumDetails({
         { once: true }
       );
     }
-  }, [transitioning, initialImgRect, onClose, open]);
+  }, [transitioning, initialImgRect, onClose]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
@@ -120,13 +93,15 @@ function AlbumDetails({
   );
 
   useEffect(() => {
-    if (ref.current) {
-      ref.current.addEventListener('keyup', handleKeyPress);
+    const currentRef = ref.current;
+
+    if (currentRef) {
+      currentRef.addEventListener('keyup', handleKeyPress);
     }
 
     return () => {
-      if (ref.current) {
-        ref.current.removeEventListener('keyup', handleKeyPress);
+      if (currentRef) {
+        currentRef.removeEventListener('keyup', handleKeyPress);
       }
     };
   }, [ref, handleKeyPress]);
@@ -135,10 +110,21 @@ function AlbumDetails({
     (el: HTMLImageElement) => {
       imageRef.current = el;
       if (el) {
-        playEnterAnimation();
+        setTransitioning(true);
+        animateElementToTargetPosition(el, initialImgRect, el.getBoundingClientRect());
+        el.addEventListener(
+          'transitionend',
+          () => {
+            setTransitioning(false);
+            if (ref.current) {
+              ref.current.focus();
+            }
+          },
+          { once: true }
+        );
       }
     },
-    [initialImgRect]
+    [initialImgRect, ref]
   );
 
   if (!visible) {

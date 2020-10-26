@@ -8,14 +8,16 @@ function Albums({ bandName }: { bandName: string }) {
   const [activeAlbum, setActiveAlbum] = useState<string | null>();
 
   const toggleAlbum = useCallback((album: Album) => {
-    if (activeAlbum) {
-      document.body.classList.remove('modal-open');
-      setActiveAlbum(null);
-    } else {
-      document.body.classList.add('modal-open');
-      setActiveAlbum(album.id)
-    }
-  }, [activeAlbum, setActiveAlbum]);
+    setActiveAlbum((activeAlbum) => {
+      if (activeAlbum) {
+        document.body.classList.remove('modal-open');
+        return null;
+      } else {
+        document.body.classList.add('modal-open');
+        return album.id;
+      }
+    });
+  }, []);
 
   return (
     <article>
