@@ -31,6 +31,7 @@ function Albums({ bandName }: { bandName: string }) {
           albums.map((album) => (
             <AlbumItem
               active={activeAlbum === album.id}
+              focusable={!activeAlbum}
               onClick={toggleAlbum}
               key={album.id}
               album={album}

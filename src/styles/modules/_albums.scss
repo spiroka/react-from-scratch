@@ -23,6 +23,10 @@
     outline: solid 2px blue;
   }
 
+  img {
+    height: auto;
+  }
+
   .album__thumb {
     display: block;
     width: 100%;
@@ -50,6 +54,7 @@
     top: 50px;
     left: 10%;
     width: 80%;
+    height: auto;
 
     @media (min-width: $break-md) {
       top: 100px;

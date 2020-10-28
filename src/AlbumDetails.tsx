@@ -20,6 +20,7 @@ function animateElementToTargetPosition(el: HTMLElement, from: DOMRect, to: DOMR
   el.style.left = `${from.left}px`;
   el.style.width = `${from.width}px`;
   el.style.height = `${from.height}px`;
+  el.style.transform = 'none';
 
   const scaleX = to.width / from.width;
   const translateX = to.left - from.left + (to.width - from.width) * 0.5;
@@ -33,7 +34,7 @@ function animateElementToTargetPosition(el: HTMLElement, from: DOMRect, to: DOMR
     } else {
       el.dispatchEvent(new Event('transitionend'));
     }
-  });
+  }, 50);
 }
 
 function AlbumDetails({
@@ -133,7 +134,13 @@ function AlbumDetails({
 
   return (
     <section ref={ref} className="album__album-details" onClick={playExitAnimation} tabIndex={0}>
-      <img ref={setInitialImagePosition} src={album.thumb} alt={album.name} />
+      <img
+        ref={setInitialImagePosition}
+        src={album.thumb}
+        alt={album.name}
+        width={100}
+        height={100}
+      />
     </section>
   );
 }
