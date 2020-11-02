@@ -44,15 +44,18 @@ function AlbumDetails({
   initialImgRect = defaultImgRect,
 }: AlbumDetailsProps) {
   const ref = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(open);
   const imageRef = useRef<HTMLElement>();
   const [transitioning, setTransitioning] = useState(false);
 
-  useEffect(() => {
-    if (open) {
-      setVisible(true);
+  const onTransitionEnd = useCallback((cb) => {
+    const el = imageRef.current;
+
+    if (!el) {
+      return;
     }
-  }, [open]);
+
+    el.addEventListener('transitionend', cb, { once: true });
+  }, []);
 
   const playExitAnimation = useCallback(() => {
     const el = imageRef.current;
@@ -62,27 +65,16 @@ function AlbumDetails({
     }
 
     if (transitioning) {
-      el.addEventListener(
-        'transitionend',
-        () => {
-          playExitAnimation();
-        },
-        { once: true }
-      );
+      onTransitionEnd(playExitAnimation);
     } else {
       setTransitioning(true);
       animateElementToTargetPosition(el, el.getBoundingClientRect(), initialImgRect);
-      el.addEventListener(
-        'transitionend',
-        () => {
-          setTransitioning(false);
-          setVisible(false);
-          onClose();
-        },
-        { once: true }
-      );
+      onTransitionEnd(() => {
+        setTransitioning(false);
+        onClose();
+      });
     }
-  }, [transitioning, initialImgRect, onClose]);
+  }, [transitioning, initialImgRect, onClose, onTransitionEnd]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
@@ -113,22 +105,18 @@ function AlbumDetails({
       if (el) {
         setTransitioning(true);
         animateElementToTargetPosition(el, initialImgRect, el.getBoundingClientRect());
-        el.addEventListener(
-          'transitionend',
-          () => {
-            setTransitioning(false);
-            if (ref.current) {
-              ref.current.focus();
-            }
-          },
-          { once: true }
-        );
+        onTransitionEnd(() => {
+          setTransitioning(false);
+          if (ref.current) {
+            ref.current.focus();
+          }
+        });
       }
     },
-    [initialImgRect, ref]
+    [initialImgRect, ref, onTransitionEnd]
   );
 
-  if (!visible) {
+  if (!open) {
     return null;
   }
 
